@@ -31,7 +31,7 @@ if (left == right)
 	set_target(down + elemsize * left, up + elemsize * left, elemsize);
 	return down;
 }
-\
+
 size_t middle = (left+right)/2;
 
 char *l_buff = merge_sort(up, down, left, middle, elemsize, compare);
@@ -63,12 +63,12 @@ return target;
 }
 
 int mergesort(void* base, size_t num, size_t size, int (*compare)(void*, void*)){
-char* st = base;
+char* temp = base;
 char* buffer = malloc(size*num);
 size_t left = 0;
 size_t right = num-1;
-char* h = merge_sort(st, buffer, left, right, size, compare);
-if(h!=st){
+char* h = merge_sort(temp, buffer, left, right, size, compare);
+if(h!=temp){
     size_t j = 0;
     for(;j<num;j++){
 	set_target(base+j*size, h+j*size, size);
