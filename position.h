@@ -11,8 +11,6 @@ typedef struct position_node {
 
 void remove_position(intrusive_list *list, int x, int y);
 
-void get_position(intrusive_node *node);
-
 void add_position(intrusive_list *list, int x, int y);
 
 void show_all_positions(intrusive_list *list);
