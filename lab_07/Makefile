@@ -1,19 +1,12 @@
+.PHONY: all clean
+CXX=g++
+CXXFLAGS=-std=c++98 -Wall -pedantic
 all: main
-
 bin:
 	mkdir -p bin
-
-main: bin/bmp.o bin/main.o
-	gcc -g bin/main.o bin/bmp.o -o main
-
-bin/main.o: src/main.c include/bmp.h bin
-	gcc -g -c src/main.c -Werror -Wall -std=c99 -o bin/main.o
-
-bin/bmp.o: src/bmp.c include/bmp.h bin
-	gcc -g -c src/bmp.c -Werror -Wall -std=c99 -o bin/bmp.o
-
-
+main: src/main.cpp bin/matrix.o include/*.h bin
+	$(CXX) $(CXXFLAGS) -o $@ -Iinclude $< bin/*
+bin/%.o: src/%.cpp include/*.h bin
+	$(CXX) $(CXXFLAGS) -c -o $@ -Iinclude $<
 clean:
-	rm -rf bin/*.o main
-
-
+	rm -rf bin main
