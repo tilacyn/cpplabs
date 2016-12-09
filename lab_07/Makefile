@@ -1,12 +1,27 @@
-.PHONY: all clean
-CXX=g++
-CXXFLAGS=-std=c++98 -Wall -pedantic
-all: main
-bin:
-	mkdir -p bin
-main: src/main.cpp bin/matrix.o include/*.h bin
-	$(CXX) $(CXXFLAGS) -o $@ -Iinclude $< bin/*
-bin/%.o: src/%.cpp include/*.h bin
-	$(CXX) $(CXXFLAGS) -c -o $@ -Iinclude $<
+CXX = g++
+CXXFLAGS = -O2 -Wall -Werror -std=c++03 -Iinclude
+LDFLAGS = 
+
+EXE = main
+SRCDIR = src
+BINDIR = bin
+
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(BINDIR)/%.o,$(wildcard $(SRCDIR)/*.cpp))
+
+all: $(EXE)
+
+$(EXE): $(BINDIR) $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(EXE) $(LDFLAGS)
+	
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -MMD -o $@ $<
+
+include $(wildcard $(BINDIR)/*.d)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
 clean:
-	rm -rf bin main
+	rm -rf $(BINDIR) $(EXE)
+
+.PHONY: clean all
