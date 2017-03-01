@@ -1,17 +1,27 @@
-all: Lab5
+CXX = g++
+CXXFLAGS = -O2 -Werror -Wall -Iinclude
+LDFLAGS = 
 
-Lab5: bin/main.o bin/clist.o bin/position.o
-	gcc -g bin/main.o bin/clist.o bin/position.o -o Lab5
+EXE = main
+SRCDIR = src
+BINDIR = bin
 
-bin/main.o: main.c clist.h position.h
-	gcc -g -c main.c -o bin/main.o
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(BINDIR)/%.o,$(wildcard $(SRCDIR)/*.cpp))
 
-bin/position.o: position.c position.h clist.h
-	gcc -g -c position.c -o bin/position.o
+all: $(EXE)
 
-bin/clist.o: clist.c clist.h
-	gcc -g -c clist.c -o bin/clist.o
+$(EXE): $(BINDIR) $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(EXE) $(LDFLAGS)
+	
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -MMD -o $@ $<
+
+include $(wildcard $(BINDIR)/*.d)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 clean:
-	rm -rf bin/*.o Lab5
+	rm -rf $(BINDIR) $(EXE)
 
+.PHONY: clean all
