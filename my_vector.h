@@ -10,7 +10,7 @@ const size_t DEFAULT_CAP = 100;
 
 inline size_t seek_power2(const size_t cap){
     size_t x = 1;
-    while(x <= cap){
+    while(x < cap){
         x *= 2;
     }
     return x;
@@ -20,7 +20,7 @@ template <class T>
 class my_vector{
 public:
     my_vector(){
-        array_ = new T[DEFAULT_CAP];
+        array_ = (T*) new char[sizeof(T) * DEFAULT_CAP];
         for(size_t i = 0; i < DEFAULT_CAP; i++){
             new (array_ + i) T();
         }
@@ -29,7 +29,7 @@ public:
     }
     my_vector(size_t n){
         capacity_ = seek_power2(n);
-        array_ = new T[capacity_];
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < capacity_; i++){
             new (array_ + i) T();
         }
@@ -37,7 +37,7 @@ public:
 	}
     my_vector(const my_vector& other){
         capacity_ = other.capacity();
-        array_ = new T[capacity_];
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < capacity_; i++){
             new (array_ + i) T();
         }
@@ -48,7 +48,7 @@ public:
     }
     my_vector& operator=(const my_vector& other){
         capacity_ = other.capacity();
-        array_ = new T[capacity_];
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < capacity_; i++){
             new (array_ + i) T();
         }
@@ -59,7 +59,7 @@ public:
         for(size_t i = 0; i < capacity_; i++){
             array_[i].~T();
         }
-        delete[] array_;
+        delete[] (char*) array_;
     }
 
     size_t size() const{
@@ -75,18 +75,19 @@ public:
         size_t old_cap = capacity_;
         T* array_old = array_;
         capacity_ = seek_power2(n);
-        array_ = new T[128];
+		size_ = std::min(size_, capacity_);
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < capacity_; i++){
             new (array_ + i) T();
         }
-        for(size_t i = 0; i < std::min(size_, capacity_); i++){
+        for(size_t i = 0; i < size_; i++){
             array_[i] = array_old[i];
         }
 
         for(size_t i = 0; i < old_cap; i++){
             array_old[i].~T();
         }
-        delete[] array_old;
+        delete[] (char*)array_old;
     }
 
     void resize(size_t n){
@@ -107,20 +108,19 @@ public:
 
     void push_back(const T& t){
         if(size_ * 2 >= capacity_){
-            reserve(size_ + 1);
+            reserve(2 * capacity_);
         }
         array_[size_++] = t;
     }
     void pop_back(){
-        size_--;
-        array_[size_].~T();
+        size_--;                 
     }
     void clear(){
         for(size_t i = 0; i < capacity_; i++){
             array_[i].~T();
         }
-        delete[] array_;
-        array_ = new T[DEFAULT_CAP];
+        delete[] (char*) array_;
+        array_ = (T*) new char[DEFAULT_CAP * sizeof(T)];
         capacity_ = DEFAULT_CAP;
         size_ = 0;
     }
