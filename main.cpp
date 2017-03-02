@@ -4,8 +4,6 @@
 #include <cassert>
 #include "my_vector.h"
 
-using namespace std;
-
 class Product {
 public:
     void namecpy(const char* s){
@@ -54,35 +52,6 @@ private:
 void print(my_vector<Product>& v) {
    	std::cout << v << std::endl;
 }
-/*
-template<typename T>
-void test_my_vector(const T& a, const T& b){
-        my_vector<T> v(2);
-        my_vector<T> v2();
-        my_vector<T> v3(v);
-        assert(v3.size() == v.size() && v3.capacity() == v.capacity());
- //       assert(v.size() == 0 && v.capacity() == 2);
-        cout << "push_back" << endl;
-        v.push_back(a);
-        v.push_back(b);
-        v.pop_back();
-   		cout << "clear" << endl;
-        v.clear();
-        cout << "done" << endl;
-        assert(v.empty());
-        cout << "1" << endl;
-        v.push_back(a);
-        cout << "2" << endl;
-        v.push_back(a);
-        cout << "reserve" << endl;
-        v.reserve(5);
-        cout << "resize" << endl;
-        assert(v.size() == 2 && v.capacity() == 8);
-        v.resize(5);
-        assert(v.size() == 5 && v.capacity() == 8);
-}
-*/
-
 
 template <class T>
 void test_my_vector(const T& a, const T& b){
