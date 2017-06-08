@@ -21,49 +21,42 @@ class my_vector{
 public:
     my_vector(){
         array_ = (T*) new char[sizeof(T) * DEFAULT_CAP];
-	for(size_t i = 0; i < DEFAULT_CAP; i++){
-            new (array_ + i) T();
-        }
         size_ = 0;
         capacity_ = DEFAULT_CAP;
     }
     my_vector(size_t n){
         capacity_ = seek_power2(n);
         array_ = (T*) new char[capacity_ * sizeof(T)];
-        for(size_t i = 0; i < capacity_; i++){
+        for(size_t i = 0; i < n; i++){
             new (array_ + i) T();
         }
-        size_ = 0;
+        size_ = n;
 	}
     my_vector(const my_vector& other){
         capacity_ = other.capacity();
-        array_ = (T*) new char[capacity_ * sizeof(T)];
-        for(size_t i = 0; i < capacity_; i++){
-            new (array_ + i) T();
-        }
         size_ = other.size();
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < size_; i++){
+            new (array_ + i) T();
             array_[i] = other[i];
         }
     }
     my_vector& operator=(const my_vector& other){
-	for(size_t i = 0; i < capacity_; i++){
+        for(size_t i = 0; i < size_; i++){
             array_[i].~T();
         }
         delete[] (char*) array_;
         capacity_ = other.capacity();
-        array_ = (T*) new char[capacity_ * sizeof(T)];
-        for(size_t i = 0; i < capacity_; i++){
-            new (array_ + i) T();
-        }
         size_ = other.size();
+        array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < size_; i++){
-            array_[i](other[i]);
+            new (array_ + i) T();
+            array_[i] = other[i];
         }
         return *this;
     }
     ~my_vector(){
-        for(size_t i = 0; i < capacity_; i++){
+        for(size_t i = 0; i < size_; i++){
             array_[i].~T();
         }
         delete[] (char*) array_;
@@ -79,19 +72,12 @@ public:
         return size_ == 0;
     }
     void reserve(size_t n){
-        size_t old_cap = capacity_;
         T* array_old = array_;
         capacity_ = seek_power2(n);
-		size_ = std::min(size_, capacity_);
-        array_ = (T*) new char[capacity_ * sizeof(T)];
-        for(size_t i = 0; i < capacity_; i++){
-            new (array_ + i) T();
-        }
+		array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < size_; i++){
+            new (array_ + i) T();
             array_[i] = array_old[i];
-        }
-
-        for(size_t i = 0; i < old_cap; i++){
             array_old[i].~T();
         }
         delete[] (char*)array_old;
@@ -99,9 +85,14 @@ public:
 
     void resize(size_t n){
         if(n <= size_){
-            size_ = n;
+            while(size_ > n){
+                array_[--size_].~T();
+            }
         }else{
             reserve(n);
+            for(size_t i = size_; i < n; i++){
+                new (array_ + i) T();
+            }
             size_ = n;
         }
     }
@@ -117,20 +108,20 @@ public:
         if(size_ * 2 >= capacity_){
             reserve(2 * capacity_);
         }
+        new (array_ + size_) T();
         array_[size_++] = t;
     }
     void pop_back(){
-        size_--;
+        array_[--size_].~T();
     }
     void clear(){
-	for(size_t i = 0; i < capacity_; i++){
+        std::cout << size_ << "\n";
+        for(size_t i = 0; i < size_; i++){
             array_[i].~T();
         }
-	delete[] (char*) array_;
-	array_ = (T*) new char[DEFAULT_CAP * sizeof(T)];
-	for(size_t i = 0; i < DEFAULT_CAP; i++){
-            new (array_ + i) T();
-        }
+        std::cout << size_ << "\n";
+        delete[] (char*) array_;
+        array_ = (T*) new char[DEFAULT_CAP * sizeof(T)];
         capacity_ = DEFAULT_CAP;
         size_ = 0;
     }
@@ -142,12 +133,12 @@ private:
 };
 
 template <class T>
-inline std::ostream& operator<<(std::ostream& stream, my_vector<T>& vec){
+inline std::ostream& operator<<(std::ostream& stream, const my_vector<T>& vec){
     for(size_t i = 0; i < vec.size(); i++){
-        stream << vec[i] << " ";
+        if(i == vec.size() - 1) stream << vec[i];
+        else stream << vec[i] << " ";
     }
     return stream;
 }
 
 #endif
-
