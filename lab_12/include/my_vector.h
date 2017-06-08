@@ -20,10 +20,8 @@ template <typename T>
 class my_vector{
 public:
     my_vector(){
-        //std::cout << "WOWOW\n";
         array_ = (T*) new char[sizeof(T) * DEFAULT_CAP];
-        //std::cout << "WOWOW\n";
-        for(size_t i = 0; i < DEFAULT_CAP; i++){
+	for(size_t i = 0; i < DEFAULT_CAP; i++){
             new (array_ + i) T();
         }
         size_ = 0;
@@ -49,6 +47,10 @@ public:
         }
     }
     my_vector& operator=(const my_vector& other){
+	for(size_t i = 0; i < capacity_; i++){
+            array_[i].~T();
+        }
+        delete[] (char*) array_;
         capacity_ = other.capacity();
         array_ = (T*) new char[capacity_ * sizeof(T)];
         for(size_t i = 0; i < capacity_; i++){
@@ -56,7 +58,7 @@ public:
         }
         size_ = other.size();
         for(size_t i = 0; i < size_; i++){
-            array_[i] = other[i];
+            array_[i](other[i]);
         }
         return *this;
     }
@@ -112,7 +114,6 @@ public:
     }
 
     void push_back(const T& t){
-        //std::cout << capacity_ << " " << size_ << "\n";
         if(size_ * 2 >= capacity_){
             reserve(2 * capacity_);
         }
@@ -122,11 +123,14 @@ public:
         size_--;
     }
     void clear(){
-        for(size_t i = 0; i < capacity_; i++){
+	for(size_t i = 0; i < capacity_; i++){
             array_[i].~T();
         }
-        delete[] (char*) array_;
-        array_ = (T*) new char[DEFAULT_CAP * sizeof(T)];
+	delete[] (char*) array_;
+	array_ = (T*) new char[DEFAULT_CAP * sizeof(T)];
+	for(size_t i = 0; i < DEFAULT_CAP; i++){
+            new (array_ + i) T();
+        }
         capacity_ = DEFAULT_CAP;
         size_ = 0;
     }
